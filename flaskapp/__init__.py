@@ -4,6 +4,9 @@ import os
 
 from flask import Flask
 
+from flaskapp import extensions
+from flaskapp.config import Config
+
 
 def create_app(test_config=None):
     """Create flask app."""
@@ -12,9 +15,16 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    # Home route
+    app.config.from_object(Config)
+    # initialize extensions
+    db = extensions.db
+    db.init_app(app)
+    extensions.migrate.init_app(app, db)
+    # Routes
     @app.route("/")
     def welcome():
         return "Welcome to the framework for flask production-ready app"
+    with app.app_context():
+        from . import resources
 
     return app
