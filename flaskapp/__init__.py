@@ -21,10 +21,15 @@ def create_app(test_config=None):
     db.init_app(app)
     extensions.migrate.init_app(app, db)
     # Routes
-    @app.route("/")
+    @app.route('/')
     def welcome():
-        return "Welcome to the framework for flask production-ready app"
+        return 'Welcome to the framework for flask production-ready app'
     with app.app_context():
         from . import resources
 
     return app
+
+app = create_app()
+
+if __name__ == 'main':
+    app.run(host="127.0.0.1", port=int(os.environ.get("PORT", 5000)))
