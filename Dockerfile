@@ -8,4 +8,6 @@ COPY . ./
 # install dependencies
 RUN pip install -r requirements.txt
 # start webserver on container startup
-CMD ['gunicorn', 'flaskapp:app']
+EXPOSE 8000
+
+CMD gunicorn -b 0.0.0.0:8000 flaskapp:app

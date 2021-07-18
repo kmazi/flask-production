@@ -8,14 +8,14 @@ from flaskapp import extensions
 from flaskapp.config import Config
 
 
-def create_app(test_config=None):
+def create_app(config=Config):
     """Create flask app."""
     app = Flask(__name__, instance_relative_config=True)
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    app.config.from_object(Config)
+    app.config.from_object(config)
     # initialize extensions
     db = extensions.db
     db.init_app(app)
@@ -28,8 +28,5 @@ def create_app(test_config=None):
         from . import resources
 
     return app
-
+    
 app = create_app()
-
-if __name__ == 'main':
-    app.run(host="127.0.0.1", port=int(os.environ.get("PORT", 5000)))
