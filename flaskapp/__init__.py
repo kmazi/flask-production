@@ -28,5 +28,3 @@ def create_app(config=Config):
         from . import resources
 
     return app
-    
-app = create_app()
