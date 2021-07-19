@@ -9,7 +9,11 @@ from flaskapp.config import Config
 
 
 def create_app(config=Config):
-    """Create flask app."""
+    """Create flask app.
+    Parameters:
+    ---
+    config - object:- Defines config for flask app
+    """
     app = Flask(__name__, instance_relative_config=True)
     try:
         os.makedirs(app.instance_path)
