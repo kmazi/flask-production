@@ -27,4 +27,4 @@ def client():
                         table.drop(db.engine)
             db.create_all()
             db.session.commit()
-        yield client
+            yield client
