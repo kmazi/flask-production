@@ -25,9 +25,9 @@ def create_app(config=Config):
     db.init_app(app)
     extensions.migrate.init_app(app, db)
     # Routes
-    @app.route("/")
+    @app.route('/')
     def welcome():
-        return "Welcome to the framework for flask production-ready app"
+        return 'Welcome to the framework for flask production-ready app'
     with app.app_context():
         from . import resources
 
