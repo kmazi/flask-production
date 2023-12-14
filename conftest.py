@@ -3,9 +3,9 @@ import pytest
 from flask.logging import logging
 from sqlalchemy import inspect
 
-from flaskapp import create_app
-from flaskapp.config import TestConfig
-from flaskapp.extensions import db
+from flaskapi import create_app
+from flaskapi.core.config import TestConfig
+from flaskapi.core.extensions import db
 
 app = create_app(TestConfig)
 

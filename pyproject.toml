@@ -1,0 +1,21 @@
+[project]
+name = "flask-production"
+authors = [{name = "Mazi Ugochukwu", email = "kingsleyu13@gmail.com"}]
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "flask",
+    "flask-migrate",
+    "flask-sqlalchemy",
+    "psycopg",
+    "psycopg-binary",
+    "psycopg-pool",
+    "typing-extensions"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "python-dotenv
+]
+

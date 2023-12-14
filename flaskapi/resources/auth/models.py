@@ -1,6 +1,6 @@
 """Define auth models."""
 
-from flaskapp.extensions import db
+from flaskapi.core.extensions import db
 from sqlalchemy.sql.expression import text
 
 
