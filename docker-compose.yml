@@ -1,0 +1,40 @@
+volumes:
+  postgres_data: {}
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/postgres/Dockerfile
+    image: retail_erp_db_postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: flaskprod
+    restart: unless-stopped
+    volumes:
+      - .:/app/
+    env_file:
+      - .env
+    command: docker/start
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - admin
+
+  admin:
+    image: dpage/pgadmin4:7.4
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=touchstone@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    ports:
+      - 8500:80
