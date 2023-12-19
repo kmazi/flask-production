@@ -1,5 +1,5 @@
 # define an alias for the specific python version used in this file.
-FROM python:3.12.1-slim-bullseye as python
+FROM python:3.12.1-slim-bookworm as python
 
 # Python build stage
 FROM python as python-build-stage
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   # dependencies for building Python packages
   build-essential
 
-# Requirements are installed here to ensure they will be cached.
+# Requirements are copied here to ensure they will be cached.
 COPY requirements/base.txt ./requirements/base.txt
 COPY requirements/prod.txt ./requirements/prod.txt
 COPY requirements.txt .
@@ -46,18 +46,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
 
 # use wheels to install python dependencies
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
   && rm -rf /wheels/
-
-
-COPY --chown=flask:flask ./docker/entrypoint /entrypoint
-RUN sed -i 's/\r$//g' /entrypoint
-RUN chmod +x /entrypoint
-
-
-COPY --chown=flask:flask ./docker/start /start
-RUN sed -i 's/\r$//g' /start
-RUN chmod +x /start
 
 # make flask owner of the WORKDIR directory as well.
 RUN chown -R flask:flask ${APP_HOME}
@@ -66,4 +57,9 @@ RUN chmod -R o+w /app/
 
 USER flask
 
-ENTRYPOINT ["/entrypoint"]
+# Copy app folder and dependencies
+COPY flaskapi flaskapi
+COPY instance instance
+COPY gunicorn.conf.py .
+
+CMD [ "gunicorn", "flaskapi:create_app()" ]
