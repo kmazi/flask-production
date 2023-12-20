@@ -62,4 +62,6 @@ COPY flaskapi flaskapi
 COPY instance instance
 COPY gunicorn.conf.py .
 
+EXPOSE 8000
+
 CMD [ "gunicorn", "flaskapi:create_app()" ]
