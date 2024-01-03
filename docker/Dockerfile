@@ -61,7 +61,10 @@ USER flask
 COPY flaskapi flaskapi
 COPY instance instance
 COPY gunicorn.conf.py .
+COPY docker/entrypoint .
 
 EXPOSE 8000
+
+ENTRYPOINT ["/app/entrypoint"]
 
 CMD [ "gunicorn", "flaskapi:create_app()" ]
