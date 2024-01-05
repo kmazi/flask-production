@@ -1,9 +1,23 @@
+volumes:
+  flaskdev_data: {}
+networks:
+  flaskdev_net:
+
 services:
+  db:
+    image: postgres:16.1
+    volumes:
+      - flaskdev_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - flaskdev_net
+
   app:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
-    image: flaskprod
+      dockerfile: ./docker/dev/Dockerfile
+    image: flaskdevscaffold
     restart: unless-stopped
     volumes:
       - .:/app/
@@ -11,3 +25,20 @@ services:
       - .env
     ports:
       - "5000:5000"
+    depends_on:
+      - db
+      - admin
+    networks:
+      - flaskdev_net
+
+  admin:
+    image: dpage/pgadmin4:7.4
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=touchstone@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    ports:
+      - 8600:80
+    networks:
+      - flaskdev_net
