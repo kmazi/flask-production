@@ -6,6 +6,7 @@ networks:
 services:
   db:
     image: postgres:16.1
+    container_name: flaskdevdb
     volumes:
       - flaskdev_data:/var/lib/postgresql/data
     env_file:
@@ -18,6 +19,7 @@ services:
       context: .
       dockerfile: ./docker/dev/Dockerfile
     image: flaskdevscaffold
+    container_name: flaskdevapp
     restart: unless-stopped
     volumes:
       - .:/app/
@@ -33,6 +35,7 @@ services:
 
   admin:
     image: dpage/pgadmin4:7.4
+    container_name: flaskdevdbadmin
     depends_on:
       - db
     environment:
