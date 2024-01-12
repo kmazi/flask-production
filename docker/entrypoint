@@ -16,9 +16,9 @@ start = time.time()
 while True:
     try:
         psycopg.connect(
-            dbname="${DB_NAME}",
-            user="${DB_USER}",
-            password="${DB_PASSWORD}",
+            dbname="${POSTGRES_DB}",
+            user="${POSTGRES_USER}",
+            password="${POSTGRES_PASSWORD}",
             host="${DB_HOST}",
             port="${DB_PORT}",
         )

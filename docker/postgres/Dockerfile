@@ -1,2 +1,2 @@
 FROM postgres:16.1
-COPY docker/postgres/init.sql /docker-entrypoint-initdb.d/
+COPY docker/postgres/init.sh /docker-entrypoint-initdb.d/
