@@ -17,4 +17,4 @@ COPY . ./
 # start webserver on container startup
 EXPOSE 8000
 
-CMD ["flask", "--app", "flaskapp:create_app(env='dev')", "run", "--debug"]
+CMD ["flask", "--app", "flaskapi:create_app(env='dev')", "run", "--host=0.0.0.0", "--debug"]
