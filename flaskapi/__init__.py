@@ -6,6 +6,7 @@ from typing import Union
 from flask import Flask
 
 from flaskapi.core.config import Config, DevConfig, TestConfig
+from flaskapi.core.extensions import db, migrate
 
 
 def get_config(env: str) -> Union[Config, DevConfig, TestConfig]:
@@ -22,13 +23,19 @@ def get_config(env: str) -> Union[Config, DevConfig, TestConfig]:
 def create_app(env: str = 'prod'):
     """Create flask app."""
     app = Flask(__name__, instance_relative_config=True)
+    
+    # Create the instance path if not available
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
     app.config.from_object(get_config(env=env))
-    # Routes
 
+    # Add extensions
+    db.init_app(app=app)
+    migrate.init_app(app=app)
+
+    # Routes
     @app.route('/')
     def welcome():
         return 'Welcome to flask production-ready scaffold'
