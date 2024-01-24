@@ -9,7 +9,7 @@ from flaskapi.core.config import Config, DevConfig, TestConfig
 from flaskapi.core.extensions import db, migrate
 
 
-def get_config(env: str) -> Union[Config, DevConfig, TestConfig]:
+def __get_config(env: str) -> Union[Config, DevConfig, TestConfig]:
     """Get application config based on app environment."""
     match env.lower():
         case 'dev':
@@ -29,11 +29,11 @@ def create_app(env: str = 'prod'):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    app.config.from_object(get_config(env=env))
+    app.config.from_object(__get_config(env=env))
 
     # Add extensions
     db.init_app(app=app)
-    migrate.init_app(app=app)
+    migrate.init_app(app=app, db=db)
 
     # Routes
     @app.route('/')
