@@ -4,6 +4,7 @@ import os
 from typing import Union
 
 from flask import Flask
+from flaskapi.blueprints.v1 import v1
 
 from flaskapi.core.config import Config, DevConfig, TestConfig
 from flaskapi.core.extensions import db, migrate
@@ -38,6 +39,9 @@ def create_app(env: str = 'prod'):
     # Routes
     @app.route('/')
     def welcome():
-        return 'Welcome to flask production-ready scaffold'
+        return 'Welcome to flask production-ready scaffold.'
+    
+    # Register blueprint
+    app.register_blueprint(blueprint=v1)
 
     return app
