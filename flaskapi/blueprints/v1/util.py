@@ -1,32 +1,26 @@
 """Define helper functionalities here."""
 
 from abc import ABC, abstractclassmethod
-from typing import Dict
+from typing import Dict, TypedDict
 
-from flask import jsonify, current_app
+from flask import jsonify
+from pydantic import BaseModel
 from sqlalchemy.orm.dynamic import AppenderQuery
 from flask_sqlalchemy.pagination import Pagination
 
 from flask.views import MethodView
-from flaskapi.core.extensions import db
 
 
-class ListView(ABC, MethodView):
-    """Validate input and query storage for output."""
-    pagination = {'page': 1, 'per_page': 10}
-    @property
-    @abstractclassmethod
-    def model(cls):
-        pass
+class ViewMixin:
+    """Define helper functions for views."""
 
-    @property
-    @abstractclassmethod
-    def serializer(cls):
-        pass
+    class PageMetadata(TypedDict):
+        page: int
+        per_page: int
 
     @staticmethod
-    def paginate(query: AppenderQuery, serializer, 
-                 page: int|None, per_page: int) -> Dict:
+    def paginate(query: AppenderQuery, serializer: BaseModel, 
+                 meta_data: PageMetadata|None=None) -> Dict:
         """Paginate data in using flask sqlalchemy paginate fnx.
 
         Arguments:
@@ -40,9 +34,8 @@ class ListView(ABC, MethodView):
         -------
         Dictionary containing results and metadata (pagination information)
         """
-        if page is not None:
-            pages: Pagination = query.paginate(page=page, per_page=per_page, 
-                                            error_out=False)
+        if meta_data is not None:
+            pages: Pagination = query.paginate(error_out=False, **meta_data)
             results = []
             for item in pages.items:
                 serialized_item = serializer.model_validate(item)
@@ -62,13 +55,26 @@ class ListView(ABC, MethodView):
             serialized_item = serializer.model_validate(item)
             results.append(serialized_item.model_dump())
         return {"data": results, "count": len(results)}
+
+class ListView(ABC, MethodView, ViewMixin):
+    """Validate input and query storage for output."""
+    pagination = {'page': 1, 'per_page': 10}
+    @property
+    @abstractclassmethod
+    def model(cls):
+        pass
+
+    @property
+    @abstractclassmethod
+    def serializer(cls):
+        pass
     
     @classmethod
     def get(cls):
         """Fetch objects from storage."""
         query = cls.model.query
         response = cls.paginate(query=query, serializer=cls.serializer, 
-                                **cls.pagination)
+                                meta_data=cls.pagination)
         return jsonify(response)
     
     @classmethod
@@ -79,6 +85,11 @@ class ListView(ABC, MethodView):
 
 class DetailView(MethodView):
     """Get, Update or Delete an object in storage."""
+    @classmethod
+    def get(cls, id: int):
+        """Get specif object from storage."""
+        return ''
+    
     @classmethod
     def put(cls, id: int):
         """Update values to new data."""
