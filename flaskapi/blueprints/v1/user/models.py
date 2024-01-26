@@ -12,9 +12,9 @@ class User(Base, db.Model):
     username = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(), nullable=False)
-    phone_number = db.Column(db.String(100), nullable=True)
-    address = db.Column(db.String(200), nullable=True)
-    lastlogin_at = db.Column(db.DateTime, nullable=True)
+    phone_number = db.Column(db.String(100))
+    address = db.Column(db.String(200))
+    lastlogin_at = db.Column(db.DateTime)
 
     def __repr__(self):
         return f'{self.username}'

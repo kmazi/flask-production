@@ -11,5 +11,4 @@ class Base:
                                    nullable=False)
     updated_at = db.Column(db.DateTime, server_default=text('NOW()'),
                                    onupdate=text('NOW()'))
-    deleted_at = db.Column(db.DateTime, server_default=text('NOW()'),
-                                   onupdate=text('NOW()'))
+    deleted_at = db.Column(db.DateTime)

@@ -8,7 +8,7 @@ class Config:
 
 class DevConfig(Config):
     """Setup Development configuration."""
-    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 

@@ -23,6 +23,8 @@ def __get_config(env: str) -> Union[Config, DevConfig, TestConfig]:
 
 def create_app(env: str = 'prod'):
     """Create flask app."""
+    # Import log config
+    from flaskapi.core import logger
     app = Flask(__name__, instance_relative_config=True)
     
     # Create the instance path if not available
