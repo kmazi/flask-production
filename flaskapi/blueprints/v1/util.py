@@ -10,14 +10,16 @@ from flask_sqlalchemy.pagination import Pagination
 
 from flask.views import MethodView
 
+from flaskapi.blueprints.v1.base_repository import Repository
+
+
+class PageMetadata(TypedDict):
+    page: int
+    per_page: int
+
 
 class ViewMixin:
     """Define helper functions for views."""
-
-    class PageMetadata(TypedDict):
-        page: int
-        per_page: int
-
     @staticmethod
     def paginate(query: AppenderQuery, serializer: BaseModel, 
                  meta_data: PageMetadata|None=None) -> Dict:
@@ -56,23 +58,25 @@ class ViewMixin:
             results.append(serialized_item.model_dump())
         return {"data": results, "count": len(results)}
 
+
 class ListView(ABC, MethodView, ViewMixin):
     """Validate input and query storage for output."""
-    pagination = {'page': 1, 'per_page': 10}
+    pagination: PageMetadata = {'page': 1, 'per_page': 10}
+    
     @property
     @abstractclassmethod
-    def model(cls):
+    def model(cls) -> AppenderQuery:
         pass
 
     @property
     @abstractclassmethod
-    def serializer(cls):
+    def serializer(cls) -> BaseModel:
         pass
     
     @classmethod
     def get(cls):
         """Fetch objects from storage."""
-        query = cls.model.query
+        query = Repository.get(cls.model)
         response = cls.paginate(query=query, serializer=cls.serializer, 
                                 meta_data=cls.pagination)
         return jsonify(response)

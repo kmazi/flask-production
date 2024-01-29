@@ -15,4 +15,5 @@ class DevConfig(Config):
 class TestConfig(Config):
     """Setup Testing configuration."""
     SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL')
+    SERVER_NAME = os.getenv('SERVER_NAME')
     TESTING = True

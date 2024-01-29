@@ -4,11 +4,16 @@ from datetime import datetime
 from typing import Union
 
 from pydantic import BaseModel, ConfigDict
+from flaskapi.blueprints.v1.base_repository import Repository
 
 from flaskapi.blueprints.v1.user.models import User
 from flaskapi.blueprints.v1.util import DetailView, ListView
 
 
+
+class UserRepository(Repository):
+    pass
+ 
 
 class UserSerializer(BaseModel):
     """Serialize User object to json format."""
