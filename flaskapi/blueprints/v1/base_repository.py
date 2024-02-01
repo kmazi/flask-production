@@ -10,11 +10,13 @@ class Repository:
     def create():
         pass
 
-    def get(Model: db.Model, detail: bool=False, filter=None) -> Query:
+    def get(Model: db.Model) -> Query:
         query = db.session.query(Model)
-        if filter:
-            query = query.filter(*filter)
         return query
+    
+    def get_one(Model: db.Model, oid):
+        data = db.session.get(Model, oid)
+        return data
 
     def update(partial: bool=True):
         pass

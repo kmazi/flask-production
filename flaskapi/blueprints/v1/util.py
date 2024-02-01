@@ -92,7 +92,9 @@ class DetailView(MethodView):
     @classmethod
     def get(cls, id: int):
         """Get specif object from storage."""
-        return ''
+        obj = Repository.get_one(cls.model, oid=id)
+        serialized_item = cls.serializer.model_validate(obj)
+        return serialized_item.model_dump()
     
     @classmethod
     def put(cls, id: int):
