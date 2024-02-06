@@ -10,7 +10,7 @@ class Repository:
     def create():
         pass
 
-    def get(Model: db.Model) -> Query:
+    def get_all(Model: db.Model) -> Query:
         query = db.session.query(Model)
         return query
     

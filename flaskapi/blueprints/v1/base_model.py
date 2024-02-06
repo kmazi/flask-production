@@ -12,3 +12,8 @@ class Base:
     updated_at = db.Column(db.DateTime, server_default=text('NOW()'),
                                    onupdate=text('NOW()'))
     deleted_at = db.Column(db.DateTime)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self

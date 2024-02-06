@@ -1,5 +1,5 @@
 # flask-production
-A starter kit for flask app
+A starter kit for flask app. A boilerplate code for flask application.
 
 ## Docker Setup
 Setup is divided into two sub groups:

@@ -3,12 +3,11 @@
 from abc import ABC, abstractclassmethod
 from typing import Dict, TypedDict
 
-from flask import jsonify
+from flask import jsonify, request, current_app
+from flask.views import MethodView
+from flask_sqlalchemy.pagination import Pagination
 from pydantic import BaseModel
 from sqlalchemy.orm.dynamic import AppenderQuery
-from flask_sqlalchemy.pagination import Pagination
-
-from flask.views import MethodView
 
 from flaskapi.blueprints.v1.base_repository import Repository
 
@@ -76,7 +75,7 @@ class ListView(ABC, MethodView, ViewMixin):
     @classmethod
     def get(cls):
         """Fetch objects from storage."""
-        query = Repository.get(cls.model)
+        query = Repository.get_all(cls.model)
         response = cls.paginate(query=query, serializer=cls.serializer, 
                                 meta_data=cls.pagination)
         return jsonify(response)
@@ -84,7 +83,11 @@ class ListView(ABC, MethodView, ViewMixin):
     @classmethod
     def post(cls):
         """Create new object and add to storage."""
-        return ''
+        data: BaseModel = cls.serializer(**request.json)
+        user = data.model_dump()
+        obj = cls.model(**user).save()
+        user['id'] = obj.id
+        return jsonify(user), 201
 
 
 class DetailView(MethodView):
