@@ -5,9 +5,10 @@ from typing import Dict, TypedDict
 
 from flask import current_app, jsonify, request
 from flask.views import MethodView
+from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
+from flask_sqlalchemy.query import Query
 from pydantic import BaseModel
-from sqlalchemy.orm.dynamic import AppenderQuery
 from werkzeug.exceptions import BadRequest
 
 from flaskapi.blueprints.v1.base_repository import Repository
@@ -28,8 +29,8 @@ class BaseView(MethodView):
 class ViewMixin:
     """Define helper functions for views."""
     @staticmethod
-    def paginate(query: AppenderQuery, serializer: BaseModel,
-                 meta_data: PageMetadata | None = None) -> Dict:
+    def paginate(query: Query, serializer: BaseModel,
+                 meta_data: PageMetadata | None = None, key: str='') -> Dict:
         """Paginate data in using flask sqlalchemy paginate fnx.
 
         Arguments:
@@ -43,6 +44,7 @@ class ViewMixin:
         -------
         Dictionary containing results and metadata (pagination information)
         """
+        key = 'data' if key == '' else key
         if meta_data is not None:
             pages: Pagination = query.paginate(error_out=False, **meta_data)
             results = []
@@ -51,7 +53,7 @@ class ViewMixin:
                 results.append(serialized_item.model_dump())
 
             return {
-                "data": results,
+                key: results,
                 "meta_data": {
                     "page": pages.page,
                     "total": pages.total,
@@ -63,7 +65,7 @@ class ViewMixin:
         for item in query.all():
             serialized_item = serializer.model_validate(item)
             results.append(serialized_item.model_dump())
-        return {"data": results, "count": len(results)}
+        return {key: results, "count": len(results)}
 
 
 class ListView(ABC, BaseView, ViewMixin):
@@ -72,7 +74,7 @@ class ListView(ABC, BaseView, ViewMixin):
 
     @property
     @abstractclassmethod
-    def model(cls) -> AppenderQuery:
+    def model(cls) -> DefaultMeta:
         pass
 
     @property
@@ -85,7 +87,8 @@ class ListView(ABC, BaseView, ViewMixin):
         """Fetch objects from storage."""
         query = Repository.get_all(cls.model)
         response = cls.paginate(query=query, serializer=cls.serializer,
-                                meta_data=cls.pagination)
+                                meta_data=cls.pagination, 
+                                key=cls.get_model_name() + 's')
         return jsonify(response)
 
     @classmethod
@@ -134,7 +137,20 @@ class DetailView(BaseView):
     @classmethod
     def patch(cls, id: int):
         """Update object in storage partially."""
-        return ''
+        obj = Repository.get_one(cls.model, oid=id)
+        ObjSchema = getattr(cls, 'patch_serializer', 'serializer')
+        # Validate, deserialize input data into pydantic model
+        # and then dump it as dict.
+        data: Dict = ObjSchema(**request.json).model_dump()
+        
+        for attribute, val in data.items():
+            if val is not None:
+                setattr(obj, attribute, val)
+            
+        obj = obj.save()
+        serialized_obj = ObjSchema.model_validate(obj).model_dump()
+        response = {cls.get_model_name(): serialized_obj}
+        return jsonify(response)
 
     @classmethod
     def delete(cls, id: int):

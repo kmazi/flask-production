@@ -1,10 +1,11 @@
 """Test functionality of user endpoint."""
 
 from typing import Dict, List
-import pytest
-from flask import url_for, current_app
-from flaskapi.blueprints.v1.user.models import User
+from flask import url_for
 
+import pytest
+
+from flaskapi.blueprints.v1.user.models import User
 from flaskapi.tests.factories.user import UserFactory
 from flaskapi.tests.utils import generate_factory_dictionary
 
@@ -32,7 +33,7 @@ class TestGetUser:
         resp = client.get(url_for('v1.user.users'))
 
         assert resp.status_code == 200
-        assert len(resp.json['data']) == len(users)
+        assert len(resp.json['users']) == len(users)
 
         values = {'page': 1, 'total': len(users), 'per_page': 10, 
                   'total_pages': 1}
@@ -73,19 +74,35 @@ class TestPostUser:
         assert users[0].password == user['password']
 
 
-# @pytest.mark.run()
-# @pytest.mark.usefixtures('app_ctx', 'setup')
-# class TestPutUser:
-#     def test_updating_user(self, client, user_dictionary):
-#         """Successfully update a user in storage."""
-#         user = UserFactory.create()
-#         resp = client.put(url_for('v1.user.single_user', id=user.id), 
-#                           json=user_dictionary)
-#         assert resp.status_code == 204
-#         users: List[User] = User.query.all()
-#         user = users[0]
-#         assert len(users) == 1
-#         assert user.address == user_dictionary['address']
-#         assert user.first_name == user_dictionary['first_name']
-#         assert user.last_name == user_dictionary['last_name']
-#         assert user.email == user_dictionary['email']
+@pytest.mark.run()
+@pytest.mark.usefixtures('app_ctx', 'setup')
+class TestPatchUser:
+    def test_updating_user_partially(self, client):
+        """Successfully update a user in storage."""
+        update = {'first_name': 'Kingsley', 'last_name': 'Mazi'}
+        user = UserFactory.create()
+        resp = client.patch(url_for('v1.user.single_user', id=user.id), 
+                          json=update)
+        updated_user = User.query.filter_by(id=user.id).first()
+        assert resp.status_code == 200
+        user = resp.json['user']
+        assert updated_user.first_name == update['first_name']
+        assert updated_user.last_name == update['last_name']
+
+
+@pytest.mark.run()
+@pytest.mark.usefixtures('app_ctx', 'setup')
+class TestPutUser:
+    def test_updating_user(self, client, user_dictionary):
+        """Successfully update a user in storage."""
+        user = UserFactory.create()
+        resp = client.put(url_for('v1.user.single_user', id=user.id), 
+                          json=user_dictionary)
+        assert resp.status_code == 204
+        users: List[User] = User.query.all()
+        user = users[0]
+        assert len(users) == 1
+        assert user.address == user_dictionary['address']
+        assert user.first_name == user_dictionary['first_name']
+        assert user.last_name == user_dictionary['last_name']
+        assert user.email == user_dictionary['email']
