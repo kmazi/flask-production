@@ -2,12 +2,13 @@
 
 from datetime import datetime, timedelta, UTC
 
-from factory import Faker
+from factory import Faker, Sequence
 
 from flaskapi.tests import BaseFactory
 
 
 class UserFactory(BaseFactory):
+    id = Sequence(lambda x: x)
     first_name = Faker('name')
     last_name = Faker('name')
     username = Faker('user_name')
@@ -16,4 +17,6 @@ class UserFactory(BaseFactory):
     phone_number = Faker('phone_number')
     address = Faker('address')
     created_at = datetime.now(UTC) - timedelta(days=3)
-    lastlogin_at = datetime.now(UTC) - timedelta(days=2)
+    lastlogin_at = datetime.now(UTC) - timedelta(days=1)
+    updated_at = datetime.now(UTC) - timedelta(days=2)
+    deleted_at = datetime.now(UTC)

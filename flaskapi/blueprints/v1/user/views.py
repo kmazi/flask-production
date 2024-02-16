@@ -27,9 +27,21 @@ class UserSerializer(BaseModel):
     password: str
     phone_number: str | None = None
     address: str | None = None
-    created_at: datetime | None = None
+    created_at: Union[datetime, None] = None
     updated_at: Union[datetime, None] = None
     deleted_at: Union[datetime, None] = None
+    lastlogin_at: Union[datetime, None] = None
+
+
+class UpdateUserSerializer(BaseModel):
+    """Serialize User object to json format for update."""
+    model_config = ConfigDict(from_attributes=True)
+
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str | None = None
+    phone_number: str | None = None
+    address: str | None = None
 
 
 class ListUsers(ListView):
