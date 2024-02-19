@@ -1,9 +1,9 @@
 """Test functionality of user endpoint."""
 
 from typing import Dict, List
-from flask import url_for
 
 import pytest
+from flask import url_for
 
 from flaskapi.blueprints.v1.user.models import User
 from flaskapi.tests.factories.user import UserFactory
@@ -21,7 +21,6 @@ def user_dictionary():
     user['created_at'] = user['created_at'].isoformat()
     user['lastlogin_at'] = user['lastlogin_at'].isoformat()
     user['updated_at'] = user['updated_at'].isoformat()
-    user['deleted_at'] = user['deleted_at'].isoformat()
     return user
 
 
@@ -74,7 +73,6 @@ class TestPostUser:
         assert users[0].password == user['password']
 
 
-@pytest.mark.run()
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestPatchUser:
     def test_updating_user_partially(self, client):
@@ -90,7 +88,6 @@ class TestPatchUser:
         assert updated_user.last_name == update['last_name']
 
 
-@pytest.mark.run()
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestPutUser:
     def test_updating_user(self, client, user_dictionary):
@@ -106,3 +103,38 @@ class TestPutUser:
         assert user.first_name == user_dictionary['first_name']
         assert user.last_name == user_dictionary['last_name']
         assert user.email == user_dictionary['email']
+
+
+@pytest.mark.usefixtures('app_ctx', 'setup')
+class TestDeleteUser:
+    def test_deleting_user_partially(self, client):
+        """Successfully delete a user in storage."""
+        user = UserFactory.create()
+        assert user.deleted_at is None
+        resp = client.delete(url_for('v1.user.single_user', id=user.id), 
+                          query_string={'partial': True})
+        assert resp.status_code == 204
+        users: List[User] = User.query.all()
+        assert len(users) == 1
+        assert users[0].deleted_at is not None    
+
+    def test_deleting_user_partially_without_passing_partial_querystr(
+            self, client):
+        """Successfully delete(partial) a user in storage."""
+        user = UserFactory.create()
+        assert user.deleted_at is None
+        resp = client.delete(url_for('v1.user.single_user', id=user.id))
+        assert resp.status_code == 204
+        users: List[User] = User.query.all()
+        assert len(users) == 1
+        assert users[0].deleted_at is not None
+
+    def test_deleting_user_permanently(self, client):
+        """Successfully delete permanently a user in storage."""
+        user = UserFactory.create()
+        assert user.deleted_at is None
+        resp = client.delete(url_for('v1.user.single_user', id=user.id),
+                          query_string={'partial': False})
+        assert resp.status_code == 204
+        users: List[User] = User.query.all()
+        assert len(users) == 0    

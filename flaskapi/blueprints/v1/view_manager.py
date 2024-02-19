@@ -122,16 +122,8 @@ class DetailView(BaseView):
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
         data: Dict = cls.serializer(**request.json).model_dump()
-        # Get all public attributes of model to update.
-        model_attributes = list(
-            filter(lambda x: x[0] != '_', cls.model.__dict__.keys()))
-        for attribute in model_attributes:
-            try:
-                setattr(obj, attribute, data[attribute])
-            except KeyError:
-                raise BadRequest(f"'{attribute}' is invalid or missing.")
-            
-        obj.save()
+        # Get all public attributes of model updated.
+        Repository.update(obj=obj, data=data, partial=False)
         return '', 204
 
     @classmethod
@@ -142,17 +134,15 @@ class DetailView(BaseView):
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
         data: Dict = ObjSchema(**request.json).model_dump()
-        
-        for attribute, val in data.items():
-            if val is not None:
-                setattr(obj, attribute, val)
-            
-        obj = obj.save()
+        obj = Repository.update(obj=obj, data=data, partial=True)
+        # Deserialize model object.
         serialized_obj = ObjSchema.model_validate(obj).model_dump()
         response = {cls.get_model_name(): serialized_obj}
         return jsonify(response)
 
     @classmethod
-    def delete(cls, id: int):
+    def delete(cls, id: int, partial: bool=True):
         """Delete object from storage."""
-        return ''
+        obj = Repository.get_one(cls.model, oid=id)
+        Repository.delete(obj=obj, partial=partial)
+        return '', 204

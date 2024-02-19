@@ -19,4 +19,3 @@ class UserFactory(BaseFactory):
     created_at = datetime.now(UTC) - timedelta(days=3)
     lastlogin_at = datetime.now(UTC) - timedelta(days=1)
     updated_at = datetime.now(UTC) - timedelta(days=2)
-    deleted_at = datetime.now(UTC)
