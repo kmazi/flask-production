@@ -9,7 +9,6 @@ from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
 from pydantic import BaseModel
-from werkzeug.exceptions import BadRequest
 
 from flaskapi.blueprints.v1.base_repository import Repository
 

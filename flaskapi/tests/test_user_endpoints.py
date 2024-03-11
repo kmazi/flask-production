@@ -41,7 +41,7 @@ class TestGetUser:
 
     def test_fetching_a_user_detail(self, users, client):
         """Successfully fetch a user detail."""
-        resp = client.get(url_for('v1.user.single_user', id=users[0].id))
+        resp = client.get(url_for('v1.user.user', id=users[0].id))
         assert resp.status_code == 200
 
         data = resp.json['user']
@@ -79,7 +79,7 @@ class TestPatchUser:
         """Successfully update a user in storage."""
         update = {'first_name': 'Kingsley', 'last_name': 'Mazi'}
         user = UserFactory.create()
-        resp = client.patch(url_for('v1.user.single_user', id=user.id), 
+        resp = client.patch(url_for('v1.user.user', id=user.id), 
                           json=update)
         updated_user = User.query.filter_by(id=user.id).first()
         assert resp.status_code == 200
@@ -93,7 +93,7 @@ class TestPutUser:
     def test_updating_user(self, client, user_dictionary):
         """Successfully update a user in storage."""
         user = UserFactory.create()
-        resp = client.put(url_for('v1.user.single_user', id=user.id), 
+        resp = client.put(url_for('v1.user.user', id=user.id), 
                           json=user_dictionary)
         assert resp.status_code == 204
         users: List[User] = User.query.all()
@@ -111,7 +111,7 @@ class TestDeleteUser:
         """Successfully delete a user in storage."""
         user = UserFactory.create()
         assert user.deleted_at is None
-        resp = client.delete(url_for('v1.user.single_user', id=user.id), 
+        resp = client.delete(url_for('v1.user.user', id=user.id), 
                           query_string={'partial': True})
         assert resp.status_code == 204
         users: List[User] = User.query.all()
@@ -123,7 +123,7 @@ class TestDeleteUser:
         """Successfully delete(partial) a user in storage."""
         user = UserFactory.create()
         assert user.deleted_at is None
-        resp = client.delete(url_for('v1.user.single_user', id=user.id))
+        resp = client.delete(url_for('v1.user.user', id=user.id))
         assert resp.status_code == 204
         users: List[User] = User.query.all()
         assert len(users) == 1
@@ -133,7 +133,7 @@ class TestDeleteUser:
         """Successfully delete permanently a user in storage."""
         user = UserFactory.create()
         assert user.deleted_at is None
-        resp = client.delete(url_for('v1.user.single_user', id=user.id),
+        resp = client.delete(url_for('v1.user.user', id=user.id),
                           query_string={'partial': False})
         assert resp.status_code == 204
         users: List[User] = User.query.all()
