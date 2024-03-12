@@ -1,7 +1,8 @@
 """Define helper functionalities here."""
 
 from abc import ABC, abstractclassmethod
-from typing import Dict, TypedDict
+from functools import wraps
+from typing import Callable, Dict, TypedDict, Type
 
 from flask import current_app, jsonify, request
 from flask.views import MethodView
@@ -82,7 +83,7 @@ class ListView(ABC, BaseView, ViewMixin):
         pass
 
     @classmethod
-    def get(cls):
+    def get(cls, query: Dict=None):
         """Fetch objects from storage."""
         query = Repository.get_all(cls.model)
         response = cls.paginate(query=query, serializer=cls.serializer,
@@ -91,10 +92,10 @@ class ListView(ABC, BaseView, ViewMixin):
         return jsonify(response)
 
     @classmethod
-    def post(cls):
+    def post(cls, data: Type[BaseModel]=None, query: Dict=None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        data: BaseModel = cls.serializer(**request.json)
+        data: Type[BaseModel] = cls.serializer(**request.json)
         # serialize into dictionary and load data into database
         model = data.model_dump()
         obj = cls.model(**model).save()

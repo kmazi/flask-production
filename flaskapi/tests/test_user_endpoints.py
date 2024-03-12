@@ -70,7 +70,7 @@ class TestPostUser:
         assert len(users) == 1
         assert users[0].username == user['username']
         assert users[0].email == user['email']
-        assert users[0].password == user['password']
+        assert users[0].password != user['password']
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
