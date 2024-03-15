@@ -6,14 +6,19 @@ from os import urandom
 from typing import Tuple
 
 
+CPU_FACTOR = 4
+REPEAT = 1
+ITERATIONS = 4096
+
+
 def _generate_salt(no_bytes=32) -> bytes:
     salt = urandom(no_bytes)
     salt = base64.b64encode(salt)
     return salt
 
 
-def hash_password(password: str, salt: bytes | None = None,
-                  n=4096, r=4, p=1) -> Tuple[str, str]:
+def hash_password(password: str, n=ITERATIONS, r=CPU_FACTOR, p=REPEAT, 
+                  salt: bytes | None = None) -> Tuple[str, str]:
     salt = salt or _generate_salt()
     hash = scrypt(password.encode(), salt=salt, n=n, r=r, p=p)
     decoded_hash = base64.b64encode(hash).decode()

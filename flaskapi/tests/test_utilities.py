@@ -1,17 +1,16 @@
 """Test all utilities implemented."""
-import pytest
 from flaskapi.blueprints.v1.user.util import hash_password, verify_password
 
 
-@pytest.mark.run()
 def test_hashing_password():
     password = 'password123'
     hashed_password, salt = hash_password(password=password)
 
     assert password != hashed_password
+    assert isinstance(salt, str)
+    assert isinstance(hashed_password, str)
 
 
-@pytest.mark.run()
 def test_verifying_password():
     password = 'fhsfis8we'
     fake_password = 'passeiw12&'

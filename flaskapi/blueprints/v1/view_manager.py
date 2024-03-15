@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractclassmethod
 from functools import wraps
-from typing import Callable, Dict, TypedDict, Type
+from typing import Callable, Dict, Type, TypedDict
 
 from flask import current_app, jsonify, request
 from flask.views import MethodView
@@ -86,7 +86,7 @@ class ListView(ABC, BaseView, ViewMixin):
     def get(cls, query: Dict=None):
         """Fetch objects from storage."""
         query = Repository.get_all(cls.model)
-        response = cls.paginate(query=query, serializer=cls.serializer,
+        response = cls.paginate(query=query, serializer=cls.schema,
                                 meta_data=cls.pagination, 
                                 key=cls.get_model_name() + 's')
         return jsonify(response)
@@ -95,7 +95,7 @@ class ListView(ABC, BaseView, ViewMixin):
     def post(cls, data: Type[BaseModel]=None, query: Dict=None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        data: Type[BaseModel] = cls.serializer(**request.json)
+        data: Type[BaseModel] = cls.schema(**request.json)
         # serialize into dictionary and load data into database
         model = data.model_dump()
         obj = cls.model(**model).save()
@@ -111,7 +111,7 @@ class DetailView(BaseView):
     def get(cls, id: int):
         """Get specif object from storage."""
         obj = Repository.get_one(cls.model, oid=id)
-        serialized_item = cls.serializer.model_validate(obj)
+        serialized_item = cls.schema.model_validate(obj)
         response = {cls.get_model_name(): serialized_item.model_dump()}
         return jsonify(response)
 
@@ -121,7 +121,7 @@ class DetailView(BaseView):
         obj = Repository.get_one(cls.model, oid=id)
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
-        data: Dict = cls.serializer(**request.json).model_dump()
+        data: Dict = cls.schema(**request.json).model_dump()
         # Get all public attributes of model updated.
         Repository.update(obj=obj, data=data, partial=False)
         return '', 204
@@ -130,7 +130,7 @@ class DetailView(BaseView):
     def patch(cls, id: int):
         """Update object in storage partially."""
         obj = Repository.get_one(cls.model, oid=id)
-        ObjSchema = getattr(cls, 'patch_serializer', 'serializer')
+        ObjSchema = getattr(cls, 'patch_schema', 'schema')
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
         data: Dict = ObjSchema(**request.json).model_dump()
