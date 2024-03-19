@@ -3,6 +3,7 @@
 from flaskapi.blueprints.v1.base_model import Base
 from flaskapi.blueprints.v1.user.util import CPU_FACTOR, ITERATIONS, REPEAT, hash_password
 from flaskapi.core.extensions import db
+from werkzeug.exceptions import BadRequest
 
 
 class User(Base, db.Model):
@@ -21,15 +22,22 @@ class User(Base, db.Model):
 
     def save(self, **kwargs):
         # Hash user password
-        security: Security = kwargs.get('security')
-        if security.password:
-            hashed_pass, salt = hash_password(password=security.password,
-                                              n=security.n, r=security.r, 
-                                              p=security.p)
-
-        self.password = hashed_pass
-        self.salt = salt
-
+        try:
+            password = kwargs.pop('password')
+        except KeyError:
+            raise BadRequest("No password specified!.")
+        # Create User security
+        security = Security()
+        hashed_pass, salt = hash_password(password=password,
+                                          n=security.n, r=security.r, 
+                                          p=security.p)
+        security.password = hashed_pass
+        security.salt = salt
+        # Create User
+        for key, val in kwargs:
+            if val is not None:
+                setattr(self, key, val)
+                
         db.session.add(self)
         db.session.commit()
         return self

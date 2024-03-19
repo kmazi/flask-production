@@ -1,16 +1,16 @@
 """Define helper functionalities here."""
 
 from abc import ABC, abstractclassmethod
-from functools import wraps
-from typing import Callable, Dict, Type, TypedDict
+from typing import Dict, Type, TypedDict
 
-from flask import current_app, jsonify, request
+from flask import jsonify, request
 from flask.views import MethodView
 from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
 from pydantic import BaseModel
 
+from flaskapi.blueprints.v1.base_model import Base
 from flaskapi.blueprints.v1.base_repository import Repository
 
 
@@ -79,7 +79,7 @@ class ListView(ABC, BaseView, ViewMixin):
 
     @property
     @abstractclassmethod
-    def serializer(cls) -> BaseModel:
+    def schema(cls) -> BaseModel:
         pass
 
     @classmethod
@@ -98,7 +98,7 @@ class ListView(ABC, BaseView, ViewMixin):
         data: Type[BaseModel] = cls.schema(**request.json)
         # serialize into dictionary and load data into database
         model = data.model_dump()
-        obj = cls.model(**model).save()
+        obj = cls.model().save(**model)
 
         model['id'] = obj.id
         response = {cls.get_model_name(): model}
@@ -108,7 +108,7 @@ class ListView(ABC, BaseView, ViewMixin):
 class DetailView(BaseView):
     """Get, Update or Delete an object in storage."""
     @classmethod
-    def get(cls, id: int):
+    def get(cls: Type[Base], id: int):
         """Get specif object from storage."""
         obj = Repository.get_one(cls.model, oid=id)
         serialized_item = cls.schema.model_validate(obj)
@@ -123,7 +123,7 @@ class DetailView(BaseView):
         # and then dump it as dict.
         data: Dict = cls.schema(**request.json).model_dump()
         # Get all public attributes of model updated.
-        Repository.update(obj=obj, data=data, partial=False)
+        cls.update(obj=obj, data=data, partial=False)
         return '', 204
 
     @classmethod

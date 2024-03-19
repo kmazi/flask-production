@@ -58,11 +58,13 @@ class TestGetUser:
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestPostUser:
+    @pytest.mark.run
     def test_creating_new_users(self, client, user_dictionary):
         """Successfully create a user."""
         user: Dict = user_dictionary
         del user['created_at']
         del user['lastlogin_at']
+        user['password'] = 'password'
         resp = client.post(url_for('v1.user.users'), json=user)
 
         assert resp.status_code == 201

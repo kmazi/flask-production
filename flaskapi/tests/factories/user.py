@@ -1,21 +1,28 @@
 """Define database table factorires."""
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
-from factory import Faker, Sequence
+import factory
 
+from flaskapi.blueprints.v1.user.models import Security, User
 from flaskapi.tests import BaseFactory
 
 
 class UserFactory(BaseFactory):
-    id = Sequence(lambda x: x)
-    first_name = Faker('name')
-    last_name = Faker('name')
-    username = Faker('user_name')
-    email = Faker('email')
-    password = Faker('password')
-    phone_number = Faker('phone_number')
-    address = Faker('address')
-    created_at = datetime.now(UTC) - timedelta(days=3)
+    first_name = factory.Faker('name')
+    last_name = factory.Faker('name')
+    username = factory.Faker('user_name')
+    email = factory.Faker('email')
+    phone_number = factory.Faker('phone_number')
+    address = factory.Faker('address')
     lastlogin_at = datetime.now(UTC) - timedelta(days=1)
-    updated_at = datetime.now(UTC) - timedelta(days=2)
+
+    class Meta(BaseFactory.Meta):
+        model = User
+
+
+class SecurityFactory(BaseFactory):
+    password = factory.Faker('password')
+
+    class Meta(BaseFactory.Meta):
+        model = Security
