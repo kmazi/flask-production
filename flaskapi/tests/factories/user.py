@@ -24,8 +24,6 @@ class UserFactory(ModelFactory):
     phone_number = factory.Faker('phone_number')
     address = factory.Faker('address')
     lastlogin_at = datetime.now(UTC) - timedelta(days=1)
-    # Relationships
-    security = factory.SubFactory(SecurityFactory)
 
     class Meta(BaseMeta):
         model = User

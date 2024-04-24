@@ -12,9 +12,9 @@ class Security(Base, db.Model):
     __tablename__ = 'securities'
     password = db.Column(db.String())
     salt = db.Column(db.String())
-    n = db.Column(db.Integer)
-    r = db.Column(db.Integer)
-    p = db.Column(db.Integer)
+    n = db.Column(db.Integer, default=ITERATIONS)
+    r = db.Column(db.Integer, default=CPU_FACTOR)
+    p = db.Column(db.Integer, default=REPEAT)
     # Relationships
     user = db.relationship('User', uselist=False, back_populates='security')
 
@@ -41,16 +41,13 @@ class User(Base, db.Model):
     def save(self, **kwargs):
         # Hash user password
         try:
-            security_dict = kwargs.pop('security')
+            hashed_pass, salt = hash_password(password=kwargs.pop('password'),
+                                              n=ITERATIONS, r=CPU_FACTOR, 
+                                              p=REPEAT)
         except KeyError:
             raise BadRequest("No password specified!.")
         # Create User security
-        security = Security()
-        hashed_pass, salt = hash_password(password=security_dict['password'],
-                                          n=ITERATIONS, r=CPU_FACTOR, 
-                                          p=REPEAT)
-        security.password = hashed_pass
-        security.salt = salt
+        security = Security(password=hashed_pass, salt=salt)
         db.session.add(security)
         db.session.flush()
 

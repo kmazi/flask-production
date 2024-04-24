@@ -18,24 +18,31 @@ class SecuritySchema(BaseModel):
     password: str
 
 
-class PostUserSchema(BaseModel):
-    """Serialize User object to json format."""
+class Serializer(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int | None = None
     first_name: str | None = None
     last_name: str | None = None
     username: str | None = None
+    email: str | None = None
+    phone_number: str | None = None
+    address: str | None = None
+    lastlogin_at: Union[datetime, None] = None
+
+class Deserializer(BaseModel):
+    """Serialize User object to json format."""
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str | None = None
     email: str
     phone_number: str | None = None
+    password: str
     address: str | None = None
     created_at: Union[datetime, None] = None
     updated_at: Union[datetime, None] = None
     deleted_at: Union[datetime, None] = None
     lastlogin_at: Union[datetime, None] = None
-
-    # Relationships
-    security:  SecuritySchema
 
 
 class PatchUserSchema(BaseModel):
@@ -58,11 +65,12 @@ class PatchUserSchema(BaseModel):
 class ListUsers(ListView):
     """Create and fetch users."""
     model = User
-    schema = PostUserSchema
+    deserializer = Deserializer
+    serializer = Serializer
 
 
 class SingleUser(DetailView):
     """Fetch update and delete a user."""
     model = User
-    schema = PostUserSchema
+    serializer = Serializer
     patch_schema = PatchUserSchema

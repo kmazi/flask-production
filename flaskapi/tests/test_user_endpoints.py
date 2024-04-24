@@ -64,7 +64,7 @@ class TestPostUser:
         user: Dict = user_dictionary
         del user['created_at']
         del user['lastlogin_at']
-        user['security']['password'] = 'password'
+        user['password'] = 'password'
         resp = client.post(url_for('v1.user.users'), json=user)
 
         resp_user = resp.json

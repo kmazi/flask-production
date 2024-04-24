@@ -79,29 +79,35 @@ class ListView(ABC, BaseView, ViewMixin):
 
     @property
     @abstractclassmethod
-    def schema(cls) -> BaseModel:
+    def serializer(cls) -> BaseModel:
+        pass
+
+    @property
+    @abstractclassmethod
+    def deserializer(cls) -> BaseModel:
         pass
 
     @classmethod
     def get(cls, query: Dict=None):
         """Fetch objects from storage."""
         query = Repository.get_all(cls.model)
-        response = cls.paginate(query=query, serializer=cls.schema,
-                                meta_data=cls.pagination, 
-                                key=cls.get_model_name() + 's')
+        response = cls.paginate(query=query, serializer=cls.serializer,
+                                meta_data=cls.pagination)
         return jsonify(response)
 
     @classmethod
-    def post(cls, data: Type[BaseModel]=None, query: Dict=None):
+    def post(cls, parameters: Dict=None, query: Dict=None, 
+             data: Type[BaseModel]=None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        data: Type[BaseModel] = cls.schema(**request.json)
+        data: Type[BaseModel] = cls.deserializer(**request.json)
         # serialize into dictionary and load data into database
         model = data.model_dump()
         obj = cls.model().save(**model)
 
-        model['id'] = obj.id
-        return jsonify(model), 201
+        # Serialize response for frontend.
+        response = cls.serializer.model_validate(obj).model_dump()
+        return jsonify(response), 201
 
 
 class DetailView(BaseView):
