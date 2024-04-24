@@ -30,12 +30,13 @@ class Base:
     @staticmethod
     def update(obj, data: Dict, partial: bool=True):
         """Update object completely or partially."""
-        if (partial):
+        if partial:
             for attribute, val in data.items():
-                if val is not None:
-                    setattr(obj, attribute, val)
+                setattr(obj, attribute, val)
         else:
             model = obj.__class__
+            # This extracts all class attributes that doesn't start with
+            # an underscore.
             model_attributes = list(
             filter(lambda x: x[0] != '_', model.__dict__.keys()))
             for attribute in model_attributes:
@@ -49,11 +50,11 @@ class Base:
         return obj
 
     @staticmethod
-    def delete(obj, partial: bool=False):
+    def delete(obj, permanent: bool=False):
         """Delete obj permanently or setting delete attr to true."""
-        if (partial):
+        if permanent:
+            db.session.delete(obj)
+        else:
             obj.deleted_at = datetime.now(UTC)
             db.session.add(obj)
-        else:
-            db.session.delete(obj)
         db.session.commit()

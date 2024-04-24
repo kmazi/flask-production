@@ -36,6 +36,8 @@ class UserSchema(BaseModel):
     deleted_at: Union[datetime, None] = None
     lastlogin_at: Union[datetime, None] = None
     password: str
+    # foreignkey
+    security_id: int
 
 
 class PatchUserSchema(BaseModel):

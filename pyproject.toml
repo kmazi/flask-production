@@ -8,8 +8,6 @@ dependencies = [
     "flask-migrate",
     "flask-sqlalchemy",
     "psycopg",
-    "psycopg-binary",
-    "psycopg-pool",
     "typing-extensions"
 ]
 
