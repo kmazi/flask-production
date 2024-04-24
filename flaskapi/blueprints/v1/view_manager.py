@@ -101,8 +101,7 @@ class ListView(ABC, BaseView, ViewMixin):
         obj = cls.model().save(**model)
 
         model['id'] = obj.id
-        response = {cls.get_model_name(): model}
-        return jsonify(response), 201
+        return jsonify(model), 201
 
 
 class DetailView(BaseView):

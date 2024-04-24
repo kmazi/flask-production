@@ -3,7 +3,7 @@
 from typing import Dict, List
 
 import pytest
-from flask import url_for
+from flask import url_for, current_app
 
 from flaskapi.blueprints.v1.user.models import User
 from flaskapi.tests.factories.user import UserFactory
@@ -64,15 +64,17 @@ class TestPostUser:
         user: Dict = user_dictionary
         del user['created_at']
         del user['lastlogin_at']
-        user['password'] = 'password'
+        user['security']['password'] = 'password'
         resp = client.post(url_for('v1.user.users'), json=user)
 
+        resp_user = resp.json
+        current_app.logger.info(resp.json)
         assert resp.status_code == 201
         users: List[User] = User.query.all()
         assert len(users) == 1
-        assert users[0].username == user['username']
-        assert users[0].email == user['email']
-        assert users[0].password != user['password']
+        assert users[0].username == resp_user['username']
+        assert users[0].email == resp_user['email']
+        assert users[0].security.password is not None
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')

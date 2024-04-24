@@ -12,14 +12,14 @@ class Security(Base, db.Model):
     __tablename__ = 'securities'
     password = db.Column(db.String())
     salt = db.Column(db.String())
-    n = db.Column(db.Integer, default=ITERATIONS)
-    r = db.Column(db.Integer, default=CPU_FACTOR)
-    p = db.Column(db.Integer, default=REPEAT)
+    n = db.Column(db.Integer)
+    r = db.Column(db.Integer)
+    p = db.Column(db.Integer)
     # Relationships
     user = db.relationship('User', uselist=False, back_populates='security')
 
     def __repr__(self):
-        return f'Security for id={self.user_id}'
+        return f'Security for user={self.user.id}'
     
     
 class User(Base, db.Model):
@@ -41,23 +41,25 @@ class User(Base, db.Model):
     def save(self, **kwargs):
         # Hash user password
         try:
-            password = kwargs.pop('password')
+            security_dict = kwargs.pop('security')
         except KeyError:
             raise BadRequest("No password specified!.")
         # Create User security
         security = Security()
-        hashed_pass, salt = hash_password(password=password,
-                                          n=security.n, r=security.r, 
-                                          p=security.p)
+        hashed_pass, salt = hash_password(password=security_dict['password'],
+                                          n=ITERATIONS, r=CPU_FACTOR, 
+                                          p=REPEAT)
         security.password = hashed_pass
         security.salt = salt
+        db.session.add(security)
+        db.session.flush()
+
         # Create User
-        for key, val in kwargs:
-            if val is not None:
-                setattr(self, key, val)
+        kwargs['security_id'] = security.id
+        for key, val in kwargs.items():
+            setattr(self, key, val)
                 
         db.session.add(self)
-        db.session.add(security)
         db.session.commit()
         return self
 

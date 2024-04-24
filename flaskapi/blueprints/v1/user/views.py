@@ -15,29 +15,27 @@ class UserRepository(Repository):
  
 
 class SecuritySchema(BaseModel):
-    user_email: str = ''
     password: str
-    salt: str
-    user_id: int
 
 
-class UserSchema(BaseModel):
+class PostUserSchema(BaseModel):
     """Serialize User object to json format."""
     model_config = ConfigDict(from_attributes=True)
 
     id: int | None = None
     first_name: str | None = None
     last_name: str | None = None
-    username: str
+    username: str | None = None
+    email: str
     phone_number: str | None = None
     address: str | None = None
     created_at: Union[datetime, None] = None
     updated_at: Union[datetime, None] = None
     deleted_at: Union[datetime, None] = None
     lastlogin_at: Union[datetime, None] = None
-    password: str
-    # foreignkey
-    security_id: int
+
+    # Relationships
+    security:  SecuritySchema
 
 
 class PatchUserSchema(BaseModel):
@@ -60,11 +58,11 @@ class PatchUserSchema(BaseModel):
 class ListUsers(ListView):
     """Create and fetch users."""
     model = User
-    schema = UserSchema
+    schema = PostUserSchema
 
 
 class SingleUser(DetailView):
     """Fetch update and delete a user."""
     model = User
-    schema = UserSchema
+    schema = PostUserSchema
     patch_schema = PatchUserSchema

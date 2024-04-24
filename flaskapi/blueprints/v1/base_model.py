@@ -19,9 +19,8 @@ class Base:
     deleted_at = db.Column(db.DateTime)
 
     def save(self, **kwargs):
-        for key, val in kwargs:
-            if val is not None:
-                setattr(self, key, val)
+        for key, val in kwargs.items():
+            setattr(self, key, val)
 
         db.session.add(self)
         db.session.commit()
