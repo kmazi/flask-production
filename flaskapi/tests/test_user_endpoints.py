@@ -25,6 +25,27 @@ def user_dictionary():
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
+class TestPostUser:
+    @pytest.mark.run
+    def test_creating_new_users_with_valid_json(self, client, 
+                                                user_dictionary):
+        """Successfully create a user."""
+        user: Dict = user_dictionary
+        del user['created_at']
+        del user['lastlogin_at']
+        user['password'] = 'password'
+        resp = client.post(url_for('v1.user.users'), json=user)
+
+        resp_user = resp.json
+        assert resp.status_code == 201
+        users: List[User] = User.query.all()
+        assert len(users) == 1
+        assert users[0].username == resp_user['username']
+        assert users[0].email == resp_user['email']
+        assert users[0].security.password is not None
+
+
+@pytest.mark.usefixtures('app_ctx', 'setup')
 class TestGetUser:
     """Test fetching multiple users."""
     def test_fetching_and_paginating_all_users(self, users, client):
@@ -54,27 +75,6 @@ class TestGetUser:
         assert users[0].password == data['password']
         assert users[0].phone_number == data['phone_number']
         assert users[0].address == data['address']
-
-
-@pytest.mark.usefixtures('app_ctx', 'setup')
-class TestPostUser:
-    @pytest.mark.run
-    def test_creating_new_users(self, client, user_dictionary):
-        """Successfully create a user."""
-        user: Dict = user_dictionary
-        del user['created_at']
-        del user['lastlogin_at']
-        user['password'] = 'password'
-        resp = client.post(url_for('v1.user.users'), json=user)
-
-        resp_user = resp.json
-        current_app.logger.info(resp.json)
-        assert resp.status_code == 201
-        users: List[User] = User.query.all()
-        assert len(users) == 1
-        assert users[0].username == resp_user['username']
-        assert users[0].email == resp_user['email']
-        assert users[0].security.password is not None
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')

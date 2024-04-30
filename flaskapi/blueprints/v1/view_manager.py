@@ -79,19 +79,22 @@ class ListView(ABC, BaseView, ViewMixin):
 
     @property
     @abstractclassmethod
-    def serializer(cls) -> BaseModel:
+    def response_schema(cls) -> Type[BaseModel]:
         pass
 
     @property
-    @abstractclassmethod
-    def deserializer(cls) -> BaseModel:
-        pass
+    def post_schema(cls) -> Type[BaseModel]:
+        return cls.response_schema
+    
+    @property
+    def patch_schema(cls) -> Type[BaseModel]:
+        return cls.response_schema
 
     @classmethod
     def get(cls, query: Dict=None):
         """Fetch objects from storage."""
         query = Repository.get_all(cls.model)
-        response = cls.paginate(query=query, serializer=cls.serializer,
+        response = cls.paginate(query=query, serializer=cls.response_schema,
                                 meta_data=cls.pagination)
         return jsonify(response)
 
@@ -100,13 +103,13 @@ class ListView(ABC, BaseView, ViewMixin):
              data: Type[BaseModel]=None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        data: Type[BaseModel] = cls.deserializer(**request.json)
+        data: Type[BaseModel] = cls.post_schema(**request.json)
         # serialize into dictionary and load data into database
         model = data.model_dump()
         obj = cls.model().save(**model)
 
         # Serialize response for frontend.
-        response = cls.serializer.model_validate(obj).model_dump()
+        response = cls.response_schema.model_validate(obj).model_dump()
         return jsonify(response), 201
 
 
