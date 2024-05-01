@@ -31,7 +31,7 @@ class TestPutUser:
         del user_dictionary['created_at']
         del user_dictionary['updated_at']
         del user_dictionary['lastlogin_at']
-        
+        del user_dictionary['email']
         user = UserFactory.create()
         resp = client.put(url_for('v1.user.user', id=user.id), 
                           json=user_dictionary)
@@ -44,4 +44,3 @@ class TestPutUser:
         assert user.address == user_dictionary['address']
         assert user.first_name == user_dictionary['first_name']
         assert user.last_name == user_dictionary['last_name']
-        assert user.email == user_dictionary['email']  

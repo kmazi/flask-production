@@ -89,6 +89,10 @@ class ListView(ABC, BaseView, ViewMixin):
     @property
     def patch_schema(cls) -> Type[BaseModel]:
         return cls.response_schema
+    
+    @property
+    def update_schema(cls) -> Type[BaseModel]:
+        return cls.response_schema
 
     @classmethod
     def get(cls, query: Dict=None):
@@ -104,6 +108,7 @@ class ListView(ABC, BaseView, ViewMixin):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
         data: Type[BaseModel] = cls.post_schema(**request.json)
+
         # serialize into dictionary and load data into database
         model = data.model_dump()
         obj = cls.model().save(**model)
@@ -127,33 +132,35 @@ class DetailView(BaseView):
     def put(cls, id: int):
         """Update all values to new data."""
         obj = Repository.get_one(cls.model, oid=id)
+
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
         post_data = request.json
-        cls.post_schema.model_validate(post_data, strict=True)
+        cls.update_schema.model_validate(post_data, strict=True)
+
         # Get all public attributes of model updated.
-        obj.update(obj=obj, data=post_data, partial=False)
+        obj.update(obj=obj, data=post_data)
         return '', 204
 
     @classmethod
     def patch(cls, id: int):
         """Update object in storage partially."""
         obj = Repository.get_one(cls.model, oid=id)
+
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
         patch_data = request.json
         cls.patch_schema.model_validate(patch_data, strict=True)
-        current_app.logger.info('Vewing incoming patch json data:')
-        current_app.logger.info(patch_data)
-        obj = obj.update(obj=obj, data=patch_data, partial=True)
+        obj = obj.update(obj=obj, data=patch_data)
+
         # Deserialize model object.
         serialized_obj = cls.response_schema.model_validate(obj).model_dump()
         response = {'data': serialized_obj}
         return jsonify(response)
 
     @classmethod
-    def delete(cls, id: int, partial: bool=True):
+    def delete(cls, id: int, permanent: bool=True):
         """Delete object from storage."""
         obj = Repository.get_one(cls.model, oid=id)
-        Repository.delete(obj=obj, partial=partial)
+        obj.delete(obj=obj, permanent=permanent)
         return '', 204

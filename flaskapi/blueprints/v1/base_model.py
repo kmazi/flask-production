@@ -27,22 +27,10 @@ class Base:
         return self
     
     @staticmethod
-    def update(obj, data: Dict, partial: bool=True):
+    def update(obj, data: Dict):
         """Update object completely or partially."""
-        if partial:
-            for attribute, val in data.items():
-                setattr(obj, attribute, val)
-        else:
-            model = obj.__class__
-            # This extracts all class attributes that doesn't start with
-            # an underscore.
-            model_attributes = list(
-            filter(lambda x: x[0] != '_', model.__dict__.keys()))
-            for attribute in model_attributes:
-                try:
-                    setattr(obj, attribute, data[attribute])
-                except KeyError:
-                    raise BadRequest(f"'{attribute}' is missing.")
+        for attribute, val in data.items():
+                setattr(obj, attribute, val)            
 
         db.session.add(obj)
         db.session.commit()
