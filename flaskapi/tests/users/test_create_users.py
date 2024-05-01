@@ -6,11 +6,11 @@ import pytest
 from flask import url_for
 
 from flaskapi.blueprints.v1.user.models import User
+from flaskapi.blueprints.v1.user.util import CPU_FACTOR, ITERATIONS, REPEAT
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestPostUser:
-    @pytest.mark.run
     def test_creating_new_users_with_valid_json(self, client, 
                                                 user_dictionary):
         """Successfully create a user."""
@@ -27,3 +27,6 @@ class TestPostUser:
         assert users[0].username == resp_user['username']
         assert users[0].email == resp_user['email']
         assert users[0].security.password is not None
+        assert users[0].security.r == CPU_FACTOR
+        assert users[0].security.n == ITERATIONS
+        assert users[0].security.p == REPEAT

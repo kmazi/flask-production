@@ -3,7 +3,7 @@
 from abc import ABC, abstractclassmethod
 from typing import Dict, Type, TypedDict
 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask.views import MethodView
 from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
@@ -119,8 +119,8 @@ class DetailView(BaseView):
     def get(cls: Type[Base], id: int):
         """Get specif object from storage."""
         obj = Repository.get_one(cls.model, oid=id)
-        serialized_item = cls.schema.model_validate(obj)
-        response = {cls.get_model_name(): serialized_item.model_dump()}
+        serialized_item = cls.response_schema.model_validate(obj)
+        response = {'data': serialized_item.model_dump()}
         return jsonify(response)
 
     @classmethod
@@ -129,23 +129,26 @@ class DetailView(BaseView):
         obj = Repository.get_one(cls.model, oid=id)
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
-        data: Dict = cls.schema(**request.json).model_dump()
+        post_data = request.json
+        cls.post_schema.model_validate(post_data, strict=True)
         # Get all public attributes of model updated.
-        cls.update(obj=obj, data=data, partial=False)
+        obj.update(obj=obj, data=post_data, partial=False)
         return '', 204
 
     @classmethod
     def patch(cls, id: int):
         """Update object in storage partially."""
         obj = Repository.get_one(cls.model, oid=id)
-        ObjSchema = getattr(cls, 'patch_schema', 'schema')
         # Validate, deserialize input data into pydantic model
         # and then dump it as dict.
-        data: Dict = ObjSchema(**request.json).model_dump()
-        obj = Repository.update(obj=obj, data=data, partial=True)
+        patch_data = request.json
+        cls.patch_schema.model_validate(patch_data, strict=True)
+        current_app.logger.info('Vewing incoming patch json data:')
+        current_app.logger.info(patch_data)
+        obj = obj.update(obj=obj, data=patch_data, partial=True)
         # Deserialize model object.
-        serialized_obj = ObjSchema.model_validate(obj).model_dump()
-        response = {cls.get_model_name(): serialized_obj}
+        serialized_obj = cls.response_schema.model_validate(obj).model_dump()
+        response = {'data': serialized_obj}
         return jsonify(response)
 
     @classmethod
