@@ -159,8 +159,12 @@ class DetailView(BaseView):
         return jsonify(response)
 
     @classmethod
-    def delete(cls, id: int, permanent: bool=True):
+    def delete(cls, id: int, permanent: bool=False):
         """Delete object from storage."""
+        permanent = request.args.get(
+            'permanent', False, 
+            type=lambda x: bool(1 if x.lower() == 'true' else 0))
+
         obj = Repository.get_one(cls.model, oid=id)
-        obj.delete(obj=obj, permanent=permanent)
+        cls.model.delete(obj=obj, permanent=permanent)
         return '', 204

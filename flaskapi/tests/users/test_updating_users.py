@@ -1,5 +1,5 @@
 from typing import List
-from flask import url_for, current_app
+from flask import url_for
 import pytest
 
 from flaskapi.blueprints.v1.user.models import User
@@ -24,7 +24,6 @@ class TestPatchUser:
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
-@pytest.mark.run
 class TestPutUser:
     def test_updating_user(self, client, user_dictionary):
         """Successfully update a user in storage."""

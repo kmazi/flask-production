@@ -16,6 +16,7 @@ class TestPostUser:
         """Successfully create a user."""
         user: Dict = user_dictionary
         del user['created_at']
+        del user['updated_at']
         del user['lastlogin_at']
         user['password'] = 'password'
         resp = client.post(url_for('v1.user.users'), json=user)

@@ -1,9 +1,9 @@
 """Define common attributes for models."""
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Dict
 
+from flask import current_app
 from sqlalchemy import text
-from werkzeug.exceptions import BadRequest
 
 from flaskapi.core.extensions import db
 
@@ -42,6 +42,7 @@ class Base:
         if permanent:
             db.session.delete(obj)
         else:
-            obj.deleted_at = datetime.now(UTC)
+            current_app.logger.info('condition is triggered!')
+            obj.deleted_at = datetime.now()
             db.session.add(obj)
         db.session.commit()
