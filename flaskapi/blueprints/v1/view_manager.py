@@ -1,9 +1,9 @@
 """Define helper functionalities here."""
 
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 from typing import Dict, Type, TypedDict
 
-from flask import jsonify, request, current_app
+from flask import jsonify, request
 from flask.views import MethodView
 from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
@@ -73,12 +73,14 @@ class ListView(ABC, BaseView, ViewMixin):
     pagination: PageMetadata = {'page': 1, 'per_page': 10}
 
     @property
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def model(cls) -> DefaultMeta:
         pass
 
     @property
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def response_schema(cls) -> Type[BaseModel]:
         pass
 

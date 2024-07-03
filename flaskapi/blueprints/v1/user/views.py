@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Union
 
-from pydantic import BaseModel, ConfigDict, Extra
+from pydantic import BaseModel, ConfigDict
 from flaskapi.blueprints.v1.base_repository import Repository
 
 from flaskapi.blueprints.v1.user.models import User
