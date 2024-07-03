@@ -1,6 +1,6 @@
 """Test functionality of user endpoint."""
 
-from typing import Dict, List
+from typing import List
 
 import pytest
 from flask import url_for
@@ -12,14 +12,10 @@ from flaskapi.blueprints.v1.user.util import CPU_FACTOR, ITERATIONS, REPEAT
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestPostUser:
     def test_creating_new_users_with_valid_json(self, client, 
-                                                user_dictionary):
+                                                slim_user):
         """Successfully create a user."""
-        user: Dict = user_dictionary
-        del user['created_at']
-        del user['updated_at']
-        del user['lastlogin_at']
-        user['password'] = 'password'
-        resp = client.post(url_for('v1.user.users'), json=user)
+        slim_user['password'] = 'password'
+        resp = client.post(url_for('v1.user.users'), json=slim_user)
 
         resp_user = resp.json
         assert resp.status_code == 201

@@ -6,7 +6,7 @@ import factory
 
 from flaskapi.blueprints.v1.user.models import Security, User
 from flaskapi.blueprints.v1.user.util import generate_salt, hash_password
-from flaskapi.tests import BaseMeta, ModelFactory
+from tests import BaseMeta, ModelFactory
 
 
 class SecurityFactory(ModelFactory):

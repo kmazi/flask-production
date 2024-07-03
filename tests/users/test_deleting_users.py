@@ -1,9 +1,10 @@
 from typing import List
-from flask import url_for
+
 import pytest
+from flask import url_for
 
 from flaskapi.blueprints.v1.user.models import User
-from flaskapi.tests.factories.user import UserFactory
+from tests.factories.user import UserFactory
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
@@ -14,14 +15,14 @@ class TestDeleteUser:
         user = UserFactory.create()
         assert user.deleted_at is None
 
-        resp = client.delete(url_for('v1.user.user', id=user.id), 
-                          query_string={'permanent': False})
-        
+        resp = client.delete(url_for('v1.user.user', id=user.id),
+                             query_string={'permanent': False})
+
         assert resp.status_code == 204
         users: List[User] = User.query.all()
 
         assert len(users) == 1
-        assert users[0].deleted_at is not None    
+        assert users[0].deleted_at is not None
 
     def test_deleting_user_partially_without_passing_partial_querystr(
             self, client):
@@ -42,8 +43,8 @@ class TestDeleteUser:
         assert user.deleted_at is None
 
         resp = client.delete(url_for('v1.user.user', id=user.id),
-                          query_string={'permanent': True})
-        
+                             query_string={'permanent': True})
+
         assert resp.status_code == 204
         users: List[User] = User.query.all()
-        assert len(users) == 0  
+        assert len(users) == 0

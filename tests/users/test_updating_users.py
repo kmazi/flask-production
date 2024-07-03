@@ -1,9 +1,10 @@
 from typing import List
-from flask import url_for
+
 import pytest
+from flask import url_for
 
 from flaskapi.blueprints.v1.user.models import User
-from flaskapi.tests.factories.user import UserFactory
+from tests.factories.user import UserFactory
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
@@ -13,9 +14,9 @@ class TestPatchUser:
         update = {'first_name': 'Kingsley', 'last_name': 'Mazi'}
         user = UserFactory.create()
         user_id = user.id
-        resp = client.patch(url_for('v1.user.user', id=user_id), 
-                          json=update)
-        
+        resp = client.patch(url_for('v1.user.user', id=user_id),
+                            json=update)
+
         updated_user = User.query.filter_by(id=user_id).first()
 
         assert resp.status_code == 200
@@ -32,7 +33,7 @@ class TestPutUser:
         del user_dictionary['lastlogin_at']
         del user_dictionary['email']
         user = UserFactory.create()
-        resp = client.put(url_for('v1.user.user', id=user.id), 
+        resp = client.put(url_for('v1.user.user', id=user.id),
                           json=user_dictionary)
         assert resp.status_code == 204
 

@@ -28,7 +28,7 @@ class User(Base, db.Model):
     first_name = db.Column(db.String())
     last_name = db.Column(db.String())
     username = db.Column(db.String())
-    email = db.Column(db.String())
+    email = db.Column(db.String(), unique=True)
     phone_number = db.Column(db.String())
     address = db.Column(db.String())
     lastlogin_at = db.Column(db.DateTime)
@@ -40,6 +40,7 @@ class User(Base, db.Model):
 
     def save(self, **kwargs):
         # Hash user password
+        print(kwargs)
         try:
             hashed_pass, salt = hash_password(password=kwargs.pop('password'),
                                               n=ITERATIONS, r=CPU_FACTOR, 
@@ -53,11 +54,7 @@ class User(Base, db.Model):
 
         # Create User
         kwargs['security_id'] = security.id
-        for key, val in kwargs.items():
-            setattr(self, key, val)
-                
-        db.session.add(self)
-        db.session.commit()
+        super(User, self).save(**kwargs)
         return self
 
     def __repr__(self):
