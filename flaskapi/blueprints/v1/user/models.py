@@ -40,7 +40,6 @@ class User(Base, db.Model):
 
     def save(self, **kwargs):
         # Hash user password
-        print(kwargs)
         try:
             hashed_pass, salt = hash_password(password=kwargs.pop('password'),
                                               n=ITERATIONS, r=CPU_FACTOR, 
