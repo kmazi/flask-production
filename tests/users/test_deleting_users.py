@@ -1,5 +1,5 @@
 from typing import List
-from flask import current_app, url_for
+from flask import url_for
 import pytest
 
 from flaskapi.blueprints.v1.user.models import User

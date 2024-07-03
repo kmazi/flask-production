@@ -26,4 +26,13 @@ Setup is divided into two sub groups:
 
     ### On Development Setup
      - Run `docker-compose --file dev.docker-compose.yml up [--build] -d` to optionally build and start the application and it's dependencies on local machine.
+
 ## System Setup
+- Install and setup Postgresql database.
+- Install python 3.12.1
+- Clone this repository into your local machine.
+- Change directory to the app directory in your shell and run `python -m venv venv`command in your terminal to create virtual environment.
+- Run `source venv/bin/activate` command in your terminal to activate your virtual environment.
+- Run `pip install --upgrade pip` command in your terminal to upgrade pip to latest version.
+- Run `pip install -r requirements/dev.txt` command in your terminal to install all package dependencies for development.
+- Run `flask --app "flaskapi:create_app(env='dev')" run --host=0.0.0.0 --debug` command in your terminal to start the dev server.
