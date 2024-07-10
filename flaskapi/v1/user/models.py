@@ -2,9 +2,9 @@
 
 from werkzeug.exceptions import BadRequest
 
-from flaskapi.blueprints.v1.base_model import Base
-from flaskapi.blueprints.v1.user.util import (CPU_FACTOR, ITERATIONS, REPEAT,
-                                              hash_password)
+from flaskapi.v1.base_model import Base
+from flaskapi.v1.user.util import (CPU_FACTOR, ITERATIONS, REPEAT,
+                                   hash_password)
 from flaskapi.core.extensions import db
 
 

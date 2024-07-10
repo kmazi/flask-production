@@ -3,8 +3,8 @@ from typing import List
 import pytest
 from flask import url_for
 
-from flaskapi.blueprints.v1.user.models import User
-from tests.factories.user import UserFactory
+from flaskapi.tests.factories.user import UserFactory
+from flaskapi.v1.user.models import User
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')

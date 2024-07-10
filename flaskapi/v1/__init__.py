@@ -2,7 +2,7 @@
 
 from flask import Blueprint
 
-from flaskapi.blueprints.v1.user.routes import user_blueprint
+from flaskapi.v1.user.routes import user_blueprint
 
 V1 = Blueprint('v1', import_name=__name__, url_prefix='/v1')
 

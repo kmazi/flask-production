@@ -4,7 +4,7 @@ import os
 
 from flask import Flask, jsonify
 
-from flaskapi.blueprints.v1 import V1
+from flaskapi.v1 import V1
 from flaskapi.core.config import Config, DevConfig, TestConfig
 from flaskapi.core.extensions import db, migrate
 

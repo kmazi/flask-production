@@ -10,8 +10,8 @@ from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
 from pydantic import BaseModel
 
-from flaskapi.blueprints.v1.base_model import Base
-from flaskapi.blueprints.v1.base_repository import Repository
+from flaskapi.v1.base_model import Base
+from flaskapi.v1.base_repository import Repository
 
 
 class PageMetadata(TypedDict):

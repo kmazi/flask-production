@@ -3,15 +3,16 @@
 from typing import List
 
 import pytest
-from flask import url_for, current_app
+from flask import url_for
 
-from flaskapi.blueprints.v1.user.models import Security, User
-from flaskapi.blueprints.v1.user.util import CPU_FACTOR, ITERATIONS, REPEAT, verify_password
+from flaskapi.v1.user.models import Security, User
+from flaskapi.v1.user.util import (CPU_FACTOR, ITERATIONS, REPEAT,
+                                   verify_password)
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestPostUser:
-    def test_creating_new_users_with_valid_json(self, client, 
+    def test_creating_new_users_with_valid_json(self, client,
                                                 slim_user):
         """Successfully create a user."""
         slim_user['password'] = 'password'
@@ -30,7 +31,7 @@ class TestPostUser:
         assert user_res['email'] == slim_user['email']
         assert user_res.get('password') is None
         security: Security = user.security
-        assert verify_password(slim_user['password'], 
+        assert verify_password(slim_user['password'],
                                pass_hash=security.password, salt=security.salt)
 
         assert user.security.r == CPU_FACTOR

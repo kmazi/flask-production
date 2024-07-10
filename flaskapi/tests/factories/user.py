@@ -4,9 +4,9 @@ from datetime import UTC, datetime, timedelta
 
 import factory
 
-from flaskapi.blueprints.v1.user.models import Security, User
-from flaskapi.blueprints.v1.user.util import generate_salt, hash_password
-from tests import BaseMeta, ModelFactory
+from flaskapi.tests import BaseMeta, ModelFactory
+from flaskapi.v1.user.models import Security, User
+from flaskapi.v1.user.util import generate_salt, hash_password
 
 
 class SecurityFactory(ModelFactory):

@@ -1,5 +1,5 @@
 """Test all utilities implemented."""
-from flaskapi.blueprints.v1.user.util import hash_password, verify_password
+from flaskapi.v1.user.util import hash_password, verify_password
 
 
 def test_hashing_password():
@@ -18,15 +18,15 @@ def test_verifying_password():
     fake_password2 = 'fhsfis8we '
     hashed_pass, salt = hash_password(password=password)
     # Verify password
-    assert not verify_password(password=fake_password, pass_hash=hashed_pass, 
+    assert not verify_password(password=fake_password, pass_hash=hashed_pass,
                                salt=salt)
-    assert not verify_password(password=fake_password1, pass_hash=hashed_pass, 
+    assert not verify_password(password=fake_password1, pass_hash=hashed_pass,
                                salt=salt)
-    assert not verify_password(password=fake_password2, pass_hash=hashed_pass, 
+    assert not verify_password(password=fake_password2, pass_hash=hashed_pass,
                                salt=salt)
-    assert verify_password(password=password, pass_hash=hashed_pass, 
+    assert verify_password(password=password, pass_hash=hashed_pass,
                            salt=salt)
-    assert not verify_password(password=password, pass_hash=hashed_pass+'27W', 
-                           salt=salt)
-    assert not verify_password(password=password, pass_hash=hashed_pass, 
+    assert not verify_password(password=password, pass_hash=hashed_pass+'27W',
+                               salt=salt)
+    assert not verify_password(password=password, pass_hash=hashed_pass,
                                salt=salt+'r7U')

@@ -4,10 +4,10 @@ from datetime import datetime
 from typing import Union
 
 from pydantic import BaseModel, ConfigDict
-from flaskapi.blueprints.v1.base_repository import Repository
+from flaskapi.v1.base_repository import Repository
 
-from flaskapi.blueprints.v1.user.models import User
-from flaskapi.blueprints.v1.view_manager import DetailView, ListView
+from flaskapi.v1.user.models import User
+from flaskapi.v1.view_manager import DetailView, ListView
 
 
 class UserRepository(Repository):

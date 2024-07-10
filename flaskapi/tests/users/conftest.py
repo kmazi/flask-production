@@ -2,8 +2,8 @@
 
 import pytest
 
-from tests.factories.user import UserFactory
-from tests.utils import generate_factory_dictionary
+from flaskapi.tests.factories.user import UserFactory
+from flaskapi.tests.utils import generate_factory_dictionary
 
 
 @pytest.fixture()
@@ -15,7 +15,7 @@ def users():
 def user_dictionary():
     """Generate dictionary containing user fields."""
     user = generate_factory_dictionary(UserFactory)
-    
+
     user['created_at'] = user['created_at'].isoformat()
     user['lastlogin_at'] = user['lastlogin_at'].isoformat()
     user['updated_at'] = user['updated_at'].isoformat()

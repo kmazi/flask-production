@@ -1,7 +1,7 @@
 """Define user blueprint."""
 from flask import Blueprint
 
-from flaskapi.blueprints.v1.user.views import ListUsers, SingleUser
+from flaskapi.v1.user.views import ListUsers, SingleUser
 
 user_blueprint = Blueprint('user', import_name=__name__, url_prefix='/users')
 
