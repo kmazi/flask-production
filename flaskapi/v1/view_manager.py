@@ -8,7 +8,7 @@ from flask.views import MethodView
 from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from flaskapi.v1.base_model import Base
 from flaskapi.v1.base_repository import Repository
@@ -24,13 +24,13 @@ class BaseView(MethodView):
     def get_model_name(cls):
         name = cls.model.__name__.lower()
         return name
-    
+
 
 class ViewMixin:
     """Define helper functions for views."""
     @staticmethod
     def paginate(query: Query, serializer: BaseModel,
-                 meta_data: PageMetadata | None = None, key: str='') -> Dict:
+                 meta_data: PageMetadata | None = None, key: str = '') -> Dict:
         """Paginate data in using flask sqlalchemy paginate fnx.
 
         Arguments:
@@ -87,17 +87,17 @@ class ListView(ABC, BaseView, ViewMixin):
     @property
     def post_schema(cls) -> Type[BaseModel]:
         return cls.response_schema
-    
+
     @property
     def patch_schema(cls) -> Type[BaseModel]:
         return cls.response_schema
-    
+
     @property
     def update_schema(cls) -> Type[BaseModel]:
         return cls.response_schema
 
     @classmethod
-    def get(cls, query: Dict=None):
+    def get(cls, query: Dict = None):
         """Fetch objects from storage."""
         query = Repository.get_all(cls.model)
         response = cls.paginate(query=query, serializer=cls.response_schema,
@@ -105,11 +105,19 @@ class ListView(ABC, BaseView, ViewMixin):
         return jsonify(response)
 
     @classmethod
-    def post(cls, parameters: Dict=None, query: Dict=None, 
-             data: Type[BaseModel]=None):
+    def post(cls, parameters: Dict = None, query: Dict = None,
+             data: Type[BaseModel] = None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        data: Type[BaseModel] = cls.post_schema(**request.json)
+        try:
+            data: Type[BaseModel] = cls.post_schema(**request.json)
+        except ValidationError as exc:
+            errors = exc.errors()
+            for error in errors:
+                del error['input']
+                del error['url']
+
+            return jsonify(errors), 401
 
         # serialize into dictionary and load data into database
         model = data.model_dump()
@@ -161,10 +169,10 @@ class DetailView(BaseView):
         return jsonify(response)
 
     @classmethod
-    def delete(cls, id: int, permanent: bool=False):
+    def delete(cls, id: int, permanent: bool = False):
         """Delete object from storage."""
         permanent = request.args.get(
-            'permanent', False, 
+            'permanent', False,
             type=lambda x: bool(1 if x.lower() == 'true' else 0))
 
         obj = Repository.get_one(cls.model, oid=id)
