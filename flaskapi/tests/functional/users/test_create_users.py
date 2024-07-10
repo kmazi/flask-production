@@ -65,6 +65,7 @@ class TestPostUser:
 
         assert resp.status_code == 201
         assert resp.json['first_name'] is None
+        assert 'first_name' not in slim_user.keys()
 
     def test_pass_creating_user_without_lastname(self, client, slim_user):
         """."""
@@ -74,3 +75,34 @@ class TestPostUser:
 
         assert resp.status_code == 201
         assert resp.json['last_name'] is None
+        assert 'last_name' not in slim_user.keys()
+
+    def test_pass_creating_user_without_username(self, client, slim_user):
+        """."""
+        slim_user['password'] = 'password'
+        del slim_user['username']
+        resp = client.post(url_for('v1.user.users'), json=slim_user)
+
+        assert resp.status_code == 201
+        assert resp.json['username'] is None
+        assert 'username' not in slim_user.keys()
+
+    def test_pass_creating_user_without_phone_number(self, client, slim_user):
+        """."""
+        slim_user['password'] = 'password'
+        del slim_user['phone_number']
+        resp = client.post(url_for('v1.user.users'), json=slim_user)
+
+        assert resp.status_code == 201
+        assert resp.json['phone_number'] is None
+        assert 'phone_number' not in slim_user.keys()
+
+    def test_pass_creating_user_without_address(self, client, slim_user):
+        """."""
+        slim_user['password'] = 'password'
+        del slim_user['address']
+        resp = client.post(url_for('v1.user.users'), json=slim_user)
+
+        assert resp.status_code == 201
+        assert resp.json['address'] is None
+        assert 'address' not in slim_user.keys()
