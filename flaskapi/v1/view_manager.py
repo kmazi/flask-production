@@ -110,16 +110,16 @@ class ListView(ABC, BaseView, ViewMixin):
              data: Type[BaseModel] = None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        try:
-            data: Type[BaseModel] = cls.post_schema(**request.json)
-        except ValidationError as exc:
-            errors = exc.errors()
-            for error in errors:
-                del error['input']
-                if error.get('url'):
-                    del error['url']
+        # try:
+        data: Type[BaseModel] = cls.post_schema(**request.json)
+        # except ValidationError as exc:
+        #     errors = exc.errors()
+        #     for error in errors:
+        #         del error['input']
+        #         if error.get('url'):
+        #             del error['url']
 
-            return jsonify(errors), 422
+        #     return jsonify(errors), 422
 
         # serialize into dictionary and load data into database
         model = data.model_dump()

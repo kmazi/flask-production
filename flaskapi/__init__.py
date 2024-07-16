@@ -4,9 +4,11 @@ import os
 
 from flask import Flask, jsonify
 
-from flaskapi.v1 import V1
 from flaskapi.core.config import Config, DevConfig, TestConfig
+from flaskapi.core.exceptions import (handle_500_errors,
+                                      validation_error_handler)
 from flaskapi.core.extensions import db, migrate
+from flaskapi.v1 import V1
 
 
 def __get_config(env: str) -> Config | DevConfig | TestConfig:
@@ -36,7 +38,7 @@ def create_app(env: str = 'prod'):
     from flaskapi.core import logger
 
     app = Flask(__name__, instance_relative_config=True)
-    
+
     # Create the instance path if not available
     try:
         os.makedirs(app.instance_path)
@@ -49,15 +51,15 @@ def create_app(env: str = 'prod'):
     migrate.init_app(app=app, db=db)
 
     # Error handlers
-    @app.errorhandler(code_or_exception=400)
-    def add_400_error_handler(error):
-        return jsonify({'detail': str(error)}), 400
+    validation_error_handler(app)
+    app.register_error_handler(500, handle_500_errors)
 
     # Routes
+
     @app.route('/')
     def welcome():
         return 'Welcome to flask production-ready scaffold.'
-    
+
     # Register blueprint
     app.register_blueprint(blueprint=V1)
 
