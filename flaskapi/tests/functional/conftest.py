@@ -19,6 +19,7 @@ def user_dictionary():
     user['created_at'] = user['created_at'].isoformat()
     user['lastlogin_at'] = user['lastlogin_at'].isoformat()
     user['updated_at'] = user['updated_at'].isoformat()
+    user['password'] = 'password'
     return user
 
 

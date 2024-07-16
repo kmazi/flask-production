@@ -11,12 +11,10 @@ from flaskapi.v1.user.util import (CPU_FACTOR, ITERATIONS, REPEAT,
 
 
 @pytest.mark.usefixtures('app_ctx', 'setup')
-@pytest.mark.one
 class TestPostUser:
     def test__pass_creating_new_users_with_valid_json(self, client,
                                                 slim_user):
         """Successfully create a user."""
-        slim_user['password'] = 'password'
         resp = client.post(url_for('v1.user.users'), json=slim_user)
         user_res = resp.json
         users: List[User] = User.query.all()
@@ -39,70 +37,32 @@ class TestPostUser:
         assert user.security.n == ITERATIONS
         assert user.security.p == REPEAT
 
-    def test_fail_creating_user_without_password(self, client, slim_user):
+    @pytest.mark.parametrize('field', ['password', 'email'])
+    def test_fail_creating_user_without_fields(self, client, slim_user,
+                                                 field):
         """."""
+        del slim_user[field]
         resp = client.post(url_for('v1.user.users'), json=slim_user)
 
-        assert resp.status_code == 401
-        assert resp.json == [{'loc': ['password'], 'msg': 'Field required', 
+        assert resp.status_code == 422
+        assert resp.json == [{'loc': [field], 'msg': 'Field required', 
                               'type': 'missing'}]
-        
-    def test_fail_creating_user_without_email(self, client, slim_user):
+    @pytest.mark.run
+    def test_fail_creating_user_with_invalid_email(self, client, slim_user):
         """."""
-        slim_user['password'] = 'password'
-        del slim_user['email']
+        slim_user['email'] = 'mazimia.ugo@com'
         resp = client.post(url_for('v1.user.users'), json=slim_user)
 
-        assert resp.status_code == 401
-        assert resp.json == [{'loc': ['email'], 'msg': 'Field required', 
-                              'type': 'missing'}]
-        
-    def test_pass_creating_user_without_firstname(self, client, slim_user):
+        assert resp.status_code == 422
+    
+    @pytest.mark.parametrize('field', ['first_name', 'last_name', 'username',
+                                       'phone_number', 'address'])
+    def test_pass_creating_user_without_fields(self, client, slim_user,
+                                               field):
         """."""
-        slim_user['password'] = 'password'
-        del slim_user['first_name']
-        resp = client.post(url_for('v1.user.users'), json=slim_user)
-
-        assert resp.status_code == 201
-        assert resp.json['first_name'] is None
-        assert 'first_name' not in slim_user.keys()
-
-    def test_pass_creating_user_without_lastname(self, client, slim_user):
-        """."""
-        slim_user['password'] = 'password'
-        del slim_user['last_name']
+        del slim_user[field]
         resp = client.post(url_for('v1.user.users'), json=slim_user)
 
         assert resp.status_code == 201
-        assert resp.json['last_name'] is None
-        assert 'last_name' not in slim_user.keys()
-
-    def test_pass_creating_user_without_username(self, client, slim_user):
-        """."""
-        slim_user['password'] = 'password'
-        del slim_user['username']
-        resp = client.post(url_for('v1.user.users'), json=slim_user)
-
-        assert resp.status_code == 201
-        assert resp.json['username'] is None
-        assert 'username' not in slim_user.keys()
-
-    def test_pass_creating_user_without_phone_number(self, client, slim_user):
-        """."""
-        slim_user['password'] = 'password'
-        del slim_user['phone_number']
-        resp = client.post(url_for('v1.user.users'), json=slim_user)
-
-        assert resp.status_code == 201
-        assert resp.json['phone_number'] is None
-        assert 'phone_number' not in slim_user.keys()
-
-    def test_pass_creating_user_without_address(self, client, slim_user):
-        """."""
-        slim_user['password'] = 'password'
-        del slim_user['address']
-        resp = client.post(url_for('v1.user.users'), json=slim_user)
-
-        assert resp.status_code == 201
-        assert resp.json['address'] is None
-        assert 'address' not in slim_user.keys()
+        assert resp.json[field] is None
+        assert field not in slim_user.keys()

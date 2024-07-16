@@ -32,6 +32,8 @@ class TestPutUser:
         del user_dictionary['updated_at']
         del user_dictionary['lastlogin_at']
         del user_dictionary['email']
+        del user_dictionary['password']
+        
         user = UserFactory.create()
         resp = client.put(url_for('v1.user.user', id=user.id),
                           json=user_dictionary)

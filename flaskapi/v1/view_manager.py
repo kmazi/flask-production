@@ -1,7 +1,7 @@
 """Define helper functionalities here."""
 
 from abc import ABC, abstractmethod
-from typing import Dict, Type, TypedDict
+from typing import Dict, Optional, Type, TypedDict
 
 from flask import jsonify, request
 from flask.views import MethodView
@@ -105,7 +105,8 @@ class ListView(ABC, BaseView, ViewMixin):
         return jsonify(response)
 
     @classmethod
-    def post(cls, parameters: Dict = None, query: Dict = None,
+    def post(cls, parameters: Optional[Dict] = None, 
+             query: Optional[Dict] = None,
              data: Type[BaseModel] = None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
@@ -115,9 +116,10 @@ class ListView(ABC, BaseView, ViewMixin):
             errors = exc.errors()
             for error in errors:
                 del error['input']
-                del error['url']
+                if error.get('url'):
+                    del error['url']
 
-            return jsonify(errors), 401
+            return jsonify(errors), 422
 
         # serialize into dictionary and load data into database
         model = data.model_dump()
