@@ -5,8 +5,8 @@ from pydantic_core import ValidationError
 
 
 def handle_500_errors(e):
-    """."""
-    return {'msg': 'An error occurred in the server. Our team is currently working on it.'}, 422
+    """Return custom message for 500 errors."""
+    return jsonify({'msg': 'An error occurred in the server. Our team is currently working on it.'}), 500
 
 
 def validation_error_handler(app: Flask):

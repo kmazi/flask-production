@@ -8,7 +8,7 @@ from flask.views import MethodView
 from flask_sqlalchemy.model import DefaultMeta
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from flaskapi.v1.base_model import Base
 from flaskapi.v1.base_repository import Repository
@@ -110,16 +110,7 @@ class ListView(ABC, BaseView, ViewMixin):
              data: Type[BaseModel] = None):
         """Create new object and add to storage."""
         # Validate incoming request and deserilize into pydantic model
-        # try:
         data: Type[BaseModel] = cls.post_schema(**request.json)
-        # except ValidationError as exc:
-        #     errors = exc.errors()
-        #     for error in errors:
-        #         del error['input']
-        #         if error.get('url'):
-        #             del error['url']
-
-        #     return jsonify(errors), 422
 
         # serialize into dictionary and load data into database
         model = data.model_dump()

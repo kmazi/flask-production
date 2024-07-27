@@ -7,7 +7,7 @@ from flask import url_for
 @pytest.mark.usefixtures('app_ctx', 'setup')
 class TestGetUser:
     """Test fetching multiple users."""
-    def test_fetching_and_paginating_all_users(self, users, client):
+    def test_pass_fetching_and_paginating_all_users(self, users, client):
         """Successfully fetch and paginate user data."""
         resp = client.get(url_for('v1.user.users'))
 
@@ -19,7 +19,7 @@ class TestGetUser:
         for k, v in resp.json['meta_data'].items():
             assert values[k] == v 
 
-    def test_fetching_a_user_detail(self, users, client):
+    def test_Pass_fetching_a_user_detail(self, users, client):
         """Successfully fetch a user detail."""
         sample_user = users[0]
         resp = client.get(url_for('v1.user.user', id=sample_user.id))
