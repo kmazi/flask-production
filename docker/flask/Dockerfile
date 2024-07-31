@@ -61,7 +61,7 @@ USER flask
 COPY flaskapi flaskapi
 COPY instance instance
 COPY gunicorn.conf.py .
-COPY docker/entrypoint .
+COPY docker/flask/entrypoint .
 
 EXPOSE 8000
 

@@ -2,7 +2,7 @@ networks:
   flaskproweb:
 
 services:
-  flaskpropgdb:
+  db:
     build: 
       context: .
       dockerfile: docker/postgres/Dockerfile
@@ -12,27 +12,27 @@ services:
     networks:
       - flaskproweb
 
-  flaskproapi:
+  app:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/flask/Dockerfile
     image: flaskpro:0.1.0
     env_file: .env
     container_name: flaskproapi
     depends_on:
-      - flaskpropgdb
+      - db
     networks:
       - flaskproweb
 
-  flaskpronginxserver:
+  nginx:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
     image: nginxserver:0.1.0
-    container_name: flaskpronginxserver
+    container_name: flaskpronginx
     ports:
       - 8000:80
     depends_on: 
-      - flaskproapi
+      - app
     networks:
       - flaskproweb
